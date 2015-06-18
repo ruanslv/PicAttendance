@@ -42,6 +42,7 @@ class attendance_tabs implements renderable {
     const TAB_REPORT        = 3;
     const TAB_EXPORT        = 4;
     const TAB_PREFERENCES   = 5;
+    const TAB_TRAIN         = 6;
 
     public $currenttab;
 
@@ -92,7 +93,13 @@ class attendance_tabs implements renderable {
             $toprow[] = new tabobject(self::TAB_PREFERENCES, $this->att->url_preferences()->out(),
                         get_string('settings', 'attendance'));
         }
-
+        // Ver quais permissoes colocar
+        // Adicionar get_string('train', 'attendance')
+        if ($this->att->perm->can_manage()) {
+            $toprow[] = new tabobject(self::TAB_TRAIN, $this->att->url_train()->out(),
+                        'Train');
+        }
+        
         return array($toprow);
     }
 }
@@ -241,6 +248,44 @@ class attendance_manage_data implements renderable {
      */
     public function url_sessions($sessionid=null, $action=null) {
         return url_helpers::url_sessions($this->att, $sessionid, $action);
+    }
+}
+
+class attendance_train_data implements renderable {
+    public $pageparams;
+    public $perm;
+    
+    private $urlpath;
+    private $urlparams;
+    private $att;
+    
+    public function __construct(attendance $att) {
+        $this->perm = $att->perm;
+        $this->pageparams = $att->pageparams;
+       
+        $this->urlpath = $att->url_train()->out_omit_querystring();
+        $params = $att->pageparams->get_significant_params();
+        $params['id'] = $att->cm->id;
+        $this->urlparams = $params;
+        $this->att = $att;
+    }
+    
+    public function url($params=array(), $excludeparams=array()) {
+        $params = array_merge($this->urlparams, $params);
+
+        foreach ($excludeparams as $paramkey) {
+            unset($params[$paramkey]);
+        }
+
+        return new moodle_url($this->urlpath, $params);
+    }
+
+    public function url_view($params=array()) {
+        return url_helpers::url_view($this->att, $params);
+    }
+
+    public function url_path() {
+        return $this->urlpath;
     }
 }
 

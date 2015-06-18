@@ -308,6 +308,26 @@ class mod_attendance_renderer extends plugin_renderer_base {
         return html_writer::table($table);
     }
 
+    protected function render_attendance_train_data(attendance_train_data $traindata) {
+        $table = new html_table();
+        $table->attributes['class'] = ' ';
+
+        // Adiciona botao do PicAttendance
+        $form = html_writer::empty_tag('br');
+        $form .= html_writer::empty_tag('br');
+        $form .= html_writer::start_tag('form', array('action' => $traindata->url(array('sesskey' => sesskey(), 'page' => $traindata->pageparams->page)), 'method' => 'post', 'enctype' => "multipart/form-data"));
+        // $form .= html_writer::start_tag('form', array('action' => 'upload.php', 'method' => 'post', 'enctype' => "multipart/form-data"));
+        $form .= "PicAttendance: ";
+        $form .= html_writer::empty_tag('input', array('type' => 'file', 'id' => 'fileToUpload', 'name' => 'fileToUpload'));
+        // usar get_string('updatelangs','tool_langimport')
+        $form .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Upload Image', 'name' => 'tatu'));
+        $form .= html_writer::end_tag('form');
+
+        $table->data[0][] = $form;
+
+        return html_writer::table($table);
+    }
+
     protected function render_attendance_take_data(attendance_take_data $takedata) {
         $controls = $this->render_attendance_take_controls($takedata);
 
