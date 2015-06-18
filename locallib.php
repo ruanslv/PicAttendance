@@ -802,7 +802,7 @@ class attendance {
      */
     public function url_train($params=array()) {
         $params = array_merge(array('id' => $this->cm->id), $params);
-        return new moodle_url('/mod/attendance/upload.php', $params);
+        return new moodle_url('/mod/attendance/train.php', $params);
     }
 
     /**
