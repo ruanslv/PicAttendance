@@ -87,10 +87,10 @@
         <FIELD NAME="faceimg" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="Image of the detected face (SHA1)"/>
         <FIELD NAME="approved" TYPE="binary" NOTNULL="true" SEQUENCE="false" COMMENT="Flag sinalizando se a foto da face está OK"/>
         <FIELD NAME="tag" TYPE="binary" NOTNULL="true" SEQUENCE="false" COMMENT="Sinaliza se a face image foi detectada ou uma tag criada."/>
-        <FIELD NAME="x1" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="y1" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="x2" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="y2" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="x" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="Origin of the rectangle that marks the face position"/>
+        <FIELD NAME="y" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="Origin of the rectangle that marks the face image (Y-axis)."/>
+        <FIELD NAME="length" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="width" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

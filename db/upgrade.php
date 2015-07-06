@@ -34,6 +34,35 @@ function xmldb_attendance_upgrade($oldversion=0) {
 
     $result = true;
 
+    // PicAttendance
+    if ($oldversion < 2015070601) {
+
+        // Define table attendance_images to be created.
+        $table = new xmldb_table('attendance_images');
+
+        // Adding fields to table attendance_images.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('groupimg', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('faceimg', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('approved', XMLDB_TYPE_BINARY, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('tag', XMLDB_TYPE_BINARY, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('x', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('y', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('length', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('width', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table attendance_images.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for attendance_images.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Attendance savepoint reached.
+        upgrade_mod_savepoint(true, 2015070601, 'attendance');
+    }
+
     if ($oldversion < 2014112000) {
         $table = new xmldb_table('attendance_sessions');
 

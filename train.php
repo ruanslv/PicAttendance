@@ -61,6 +61,8 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
               $contextmodule = context_module::instance($cm->id);
               $fs = get_file_storage();
                
+              $group_img_name = sha1($image);
+               
               // Prepare file record object
               $fileinfo = array(
                   'contextid' => $coursecontext->id, // ID of context
@@ -68,7 +70,7 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                   'filearea' => 'myarea',     // usually = table name
                   'itemid' => 0,               // usually = ID of row in table
                   'filepath' => '/',           // any path beginning and ending in /
-                  'filename' => sha1($image)); // any filename
+                  'filename' => $group_img_name); // any filename
                
 
               if (!$fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
@@ -77,6 +79,7 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
               }
               $faces = PICATTENDANCE_find_faces(dirname(__FILE__)."/lbpcascade_frontalface.xml", $image);
               foreach ($faces as $face) {
+                $face_img_name = sha1($face["face"]);
                 // Prepare file record object
                 $fileinfo = array(
                     'contextid' => $coursecontext->id, // ID of context
@@ -84,7 +87,7 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                     'filearea' => 'myarea',     // usually = table name
                     'itemid' => 0,               // usually = ID of row in table
                     'filepath' => '/',           // any path beginning and ending in /
-                    'filename' => sha1($face["face"])); // any filename
+                    'filename' => $face_img_name); // any filename
                 if (!$fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
                       $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename'])) {
                   $fs->create_file_from_string($fileinfo, $face["face"]);
@@ -92,6 +95,19 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                   // $face["rectangle"]["y"]
                   // $face["rectangle"]["width"]
                   // $face["rectangle"]["height"]
+                  $fs_record = new stdClass();
+                  
+                  $fs_record->groupimg = $group_img_name;
+                  $fs_record->faceimg = $face_img_name;
+                  // $fs_record->studentid = ?? 
+                  $fs_record->approved = '0';
+                  $fs_record->tag = '0';
+                  $fs_record->x = $face["rectangle"]["x"];
+                  $fs_record->y = $face["rectangle"]["y"];
+                  $fs_record->width = $face["rectangle"]["width"];
+                  $fs_record->length = $face["rectangle"]["height"];
+                  // append
+                  $lastinsertid = $DB->insert_record('attendance_images', $fs_record, false);
                 }
               }
             }
