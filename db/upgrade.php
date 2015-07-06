@@ -35,6 +35,61 @@ function xmldb_attendance_upgrade($oldversion=0) {
     $result = true;
 
     // PicAttendance
+    if ($oldversion < 2015070602) {
+
+        // Define field detected to be added to attendance_images.
+        $table = new xmldb_table('attendance_images');
+        $field = new xmldb_field('detected', XMLDB_TYPE_BINARY, null, null, XMLDB_NOTNULL, null, null, 'tag');
+
+        // Conditionally launch add field detected.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('studentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'width');
+
+        // Conditionally launch add field studentid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('studentid', XMLDB_INDEX_NOTUNIQUE, array('studentid'));
+
+        // Conditionally launch add index studentid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        
+        $index = new xmldb_index('groupimg', XMLDB_INDEX_NOTUNIQUE, array('groupimg'));
+
+        // Conditionally launch add index groupimg.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        
+        // Define table attendance_session_images to be created.
+        $table = new xmldb_table('attendance_session_images');
+
+        // Adding fields to table attendance_session_images.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('groupimg', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table attendance_session_images.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table attendance_session_images.
+        $table->add_index('sessionid', XMLDB_INDEX_NOTUNIQUE, array('sessionid'));
+
+        // Conditionally launch create table for attendance_session_images.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Attendance savepoint reached.
+        upgrade_mod_savepoint(true, 2015070602, 'attendance');
+    }
+    
     if ($oldversion < 2015070601) {
 
         // Define table attendance_images to be created.

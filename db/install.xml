@@ -87,14 +87,33 @@
         <FIELD NAME="faceimg" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="Image of the detected face (SHA1)"/>
         <FIELD NAME="approved" TYPE="binary" NOTNULL="true" SEQUENCE="false" COMMENT="Flag sinalizando se a foto da face está OK"/>
         <FIELD NAME="tag" TYPE="binary" NOTNULL="true" SEQUENCE="false" COMMENT="Sinaliza se a face image foi detectada ou uma tag criada."/>
+        <FIELD NAME="detected" TYPE="binary" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="x" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="Origin of the rectangle that marks the face position"/>
         <FIELD NAME="y" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" COMMENT="Origin of the rectangle that marks the face image (Y-axis)."/>
         <FIELD NAME="length" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="width" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="studentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="studentid" UNIQUE="false" FIELDS="studentid"/>
+        <INDEX NAME="groupimg" UNIQUE="false" FIELDS="groupimg"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="attendance_session_images" COMMENT="Session ids vs group images">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="groupimg" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="sessionid" UNIQUE="false" FIELDS="sessionid"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

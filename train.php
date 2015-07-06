@@ -99,21 +99,28 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                   
                   $fs_record->groupimg = $group_img_name;
                   $fs_record->faceimg = $face_img_name;
-                  // $fs_record->studentid = ?? 
                   $fs_record->approved = '0';
                   $fs_record->tag = '0';
+                  $fs_record->detected = '0';
                   $fs_record->x = $face["rectangle"]["x"];
                   $fs_record->y = $face["rectangle"]["y"];
                   $fs_record->width = $face["rectangle"]["width"];
                   $fs_record->length = $face["rectangle"]["height"];
                   // append
                   $lastinsertid = $DB->insert_record('attendance_images', $fs_record, false);
+                  
+                  $sess_record = new stdClass();
+                  $sess_record->groupimg = $group_img_name;
+                  // Imagens para training tem sessionid = 0
+                  $lastinsertid = $DB->insert_record('attendance_session_images', $sess_record, false);
                 }
               }
             }
             $uploadOk = 1;
+            // COLOCAR: redirect($att->url_manage(), get_string('sessionupdated', 'attendance'));
         } else {
             echo "File is not an image.";
+            // print_error('sessionsnotfound', 'attendance', $att->url_manage());
             $uploadOk = 0;
         }
     }
