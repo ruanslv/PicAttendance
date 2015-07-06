@@ -51,7 +51,50 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
     if(isset($_POST["tatu"])) {
         $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
         if($check !== false) {
-            echo "File is an imageeee WOW - " . $check["mime"] . ".";
+            //echo "File is an imageeee WOW - " . $check["mime"] . ".";
+            $image_file = fopen($_FILES["fileToUpload"]['tmp_name'], 'rb');
+            $image = fread($image_file, 20000000);
+            if (!$image) {
+              echo "Image is too big";
+            } else {
+              $coursecontext = context_course::instance($course->id);
+              $contextmodule = context_module::instance($cm->id);
+              $fs = get_file_storage();
+               
+              // Prepare file record object
+              $fileinfo = array(
+                  'contextid' => $coursecontext->id, // ID of context
+                  'component' => 'mod_attendance',     // usually = table name
+                  'filearea' => 'myarea',     // usually = table name
+                  'itemid' => 0,               // usually = ID of row in table
+                  'filepath' => '/',           // any path beginning and ending in /
+                  'filename' => sha1($image)); // any filename
+               
+
+              if (!$fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
+                      $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename'])) {
+                $fs->create_file_from_string($fileinfo, $image);
+              }
+              $faces = PICATTENDANCE_find_faces(dirname(__FILE__)."/lbpcascade_frontalface.xml", $image);
+              foreach ($faces as $face) {
+                // Prepare file record object
+                $fileinfo = array(
+                    'contextid' => $coursecontext->id, // ID of context
+                    'component' => 'mod_attendance',     // usually = table name
+                    'filearea' => 'myarea',     // usually = table name
+                    'itemid' => 0,               // usually = ID of row in table
+                    'filepath' => '/',           // any path beginning and ending in /
+                    'filename' => sha1($face["face"])); // any filename
+                if (!$fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
+                      $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename'])) {
+                  $fs->create_file_from_string($fileinfo, $face["face"]);
+                  // $face["rectangle"]["x"]
+                  // $face["rectangle"]["y"]
+                  // $face["rectangle"]["width"]
+                  // $face["rectangle"]["height"]
+                }
+              }
+            }
             $uploadOk = 1;
         } else {
             echo "File is not an image.";
@@ -78,6 +121,8 @@ echo $output->header();
 echo $output->heading(get_string('attendanceforthecourse', 'attendance').' :: ' .$course->fullname);
 echo $output->render($tabs);
 echo $output->render($button);
+
+
 // echo $output->render($filtercontrols);
 // echo $output->render($reportdata);
 
