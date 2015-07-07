@@ -99,9 +99,9 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                   
                   $fs_record->groupimg = $group_img_name;
                   $fs_record->faceimg = $face_img_name;
-                  $fs_record->approved = '0';
-                  $fs_record->tag = '0';
-                  $fs_record->detected = '0';
+                  $fs_record->approved = 0;
+                  $fs_record->tag = 0;
+                  $fs_record->detected = 1;
                   $fs_record->x = $face["rectangle"]["x"];
                   $fs_record->y = $face["rectangle"]["y"];
                   $fs_record->width = $face["rectangle"]["width"];

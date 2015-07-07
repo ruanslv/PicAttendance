@@ -716,6 +716,7 @@ class mod_attendance_renderer extends plugin_renderer_base {
 
             $o .= construct_user_data_stat($userdata->stat, $userdata->statuses,
                         $userdata->gradable, $userdata->grade, $userdata->maxgrade, $userdata->decimalpoints);
+                        //$userdata->sessionslog[0]->id, sesskey())); //picattendance: sessid aleatorio
 
             $o .= $this->render_attendance_filter_controls($userdata->filtercontrols);
 
@@ -733,7 +734,7 @@ class mod_attendance_renderer extends plugin_renderer_base {
 
                 $o .= construct_user_data_stat($userdata->stat[$ca->attid], $userdata->statuses[$ca->attid],
                             $userdata->gradable[$ca->attid], $userdata->grade[$ca->attid],
-                            $userdata->maxgrade[$ca->attid], $userdata->decimalpoints);
+                            $userdata->maxgrade[$ca->attid], $userdata->decimalpoints);//, $userdata->sessionslog[0]->id, sesskey());
             }
         }
 
@@ -756,8 +757,12 @@ class mod_attendance_renderer extends plugin_renderer_base {
         $table->size = array('1px', '1px', '1px', '1px', '*', '1px', '1px', '*');
 
         $i = 0;
+        $sessid = 0;
         foreach ($userdata->sessionslog as $sess) {
             $i++;
+            if ($i == 1) {
+                $sessid = $sess->id;
+            }
 
             $row = new html_table_row();
             $row->cells[] = $i;
@@ -792,9 +797,22 @@ class mod_attendance_renderer extends plugin_renderer_base {
                     $row->cells[] = '';
                 }
             }
-
             $table->data[] = $row;
         }
+
+        // PicAttendance
+        $url = new moodle_url('/mod/attendance/train_student.php', array('sessid' => $sessid, 'sesskey' => sesskey()));
+        $row = new html_table_row();
+        $i++;
+        $row->cells[] = $i;
+        // get_string('updatelangs','tool_langimport')
+        $cell = new html_table_cell(html_writer::link($url, 'PicAttendance: Training'));
+        $cell->colspan = 5;
+        $row->cells[] = $cell;
+
+        // $row->cells[] = $form;
+    
+        $table->data[] = $row; 
 
         return html_writer::table($table);
     }

@@ -250,7 +250,21 @@ function construct_user_data_stat($stat, $statuses, $gradable, $grade, $maxgrade
         $row->cells[] = sprintf("%0.{$decimalpoints}f", $percent);
         $stattable->data[] = $row;
     }
+    
+     // PicAttendance
+    /*
+    $url = new moodle_url('/mod/attendance/train_student.php', array('sessid' => $sessid, 'sesskey' => $sesskey));
+    $form = html_writer::empty_tag('br');
+    $form .= "PicAttendance: ";
+    $form .= html_writer::start_tag('form', array('action' => $url));
+    // usar get_string('updatelangs','tool_langimport')
+    $form .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Train'));
+    $form .= html_writer::end_tag('form');
 
+    $row = new html_table_row();
+    $row->cells[] = $form;
+    $stattable->data[] = $row;
+    */
     return html_writer::table($stattable);
 }
 

@@ -377,32 +377,32 @@ function attendance_scale_used_anywhere($scaleid) {
 function attendance_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
     global $CFG, $DB;
 
-    if ($context->contextlevel != CONTEXT_MODULE) {
-        return false;
-    }
+    // if ($context->contextlevel != CONTEXT_MODULE) {
+    //     return false;
+    // }
 
-    require_login($course, false, $cm);
+    // require_login($course, false, $cm);
 
-    if (!$att = $DB->get_record('attendance', array('id' => $cm->instance))) {
-        return false;
-    }
+    // if (!$att = $DB->get_record('attendance', array('id' => $cm->instance))) {
+    //     return false;
+    // }
 
-    // Session area is served by pluginfile.php.
-    $fileareas = array('session');
-    if (!in_array($filearea, $fileareas)) {
-        return false;
-    }
+    // // Session area is served by pluginfile.php.
+    // $fileareas = array('session');
+    // if (!in_array($filearea, $fileareas)) {
+    //     return false;
+    // }
 
     $sessid = (int)array_shift($args);
-    if (!$sess = $DB->get_record('attendance_sessions', array('id' => $sessid))) {
-        return false;
-    }
+    // if (!$sess = $DB->get_record('attendance_sessions', array('id' => $sessid))) {
+    //     //return false;
+    // }
 
     $fs = get_file_storage();
     $relativepath = implode('/', $args);
     $fullpath = "/$context->id/mod_attendance/$filearea/$sessid/$relativepath";
     if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
-        return false;
+        //return false;
     }
     send_stored_file($file, 0, 0, true);
 }
