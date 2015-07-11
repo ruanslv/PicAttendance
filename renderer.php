@@ -1084,11 +1084,13 @@ class mod_attendance_renderer extends plugin_renderer_base {
       $htmltext .= html_writer::end_tag('canvas');
       $htmltext .= html_writer::end_tag('div');
       $htmltext .= html_writer::start_tag('form', array('action' => $imagetaggingdata->actionurl, 'method' => 'post'));
-      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'x'));
-      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'y'));
-      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'width'));
-      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'height'));
-      $htmltext .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Submit Tagging', 'name' => 'tatu'));
+      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'x', 'id' => 'x'));
+      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'y', 'id' => 'y'));
+      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'width', 'id' => 'width'));
+      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'height', 'id' => 'height'));
+      $htmltext .= html_writer::empty_tag('button', array('type' => 'submit', 'value' => 'has_tagged', 'name' => 'action'));
+      $htmltext .= 'Submit Tagging';
+      $htmltext .= html_writer::end_tag('button');
       $htmltext .= html_writer::end_tag('form');
       $htmltext .= html_writer::start_tag('script', array('type' => 'text/javascript', 'src' => 'tagging.js'));
       $htmltext .= html_writer::end_tag('script');

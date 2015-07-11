@@ -1,0 +1,5 @@
+.img{position:absolute;z-index:1;}
+#canvas{
+    position:relative;
+    z-index:20;
+}

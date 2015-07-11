@@ -1759,3 +1759,14 @@ function att_log_convert_url(moodle_url $fullurl) {
     return substr($fullurl->out(), strlen($baseurl));
 }
 
+function att_rectangle_intersection_over_union($rectangle1, $rectangle2) {
+  $x_overlap = max(0, min($rectangle1['x'] + $rectangle1['width'], $rectangle2['x'] + $rectangle2['width']) - max($rectangle1['x'], $rectangle2['x']));
+  $y_overlap = max(0, min($rectangle1['y'] + $rectangle1['height'], $rectangle2['y'] + $rectangle2['height']) - max($rectangle1['y'], $rectangle2['y']));
+  $overlapArea = $x_overlap * $y_overlap;
+  $unionArea = $rectangle1['width'] * $rectangle1['height'] + $rectangle2['width'] * $rectangle2['height'] - $overlapArea;
+  if ($unionArea !== 0) {
+    return (float) $overlapArea / $unionArea;
+  } else {
+    return (float) 0;
+  }
+}

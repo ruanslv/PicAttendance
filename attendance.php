@@ -50,7 +50,7 @@ $groupimgs = $DB->get_records('attendance_session_images', array('sessionid' => 
 
 $faceimgrec = false;
 foreach ($groupimgs as $groupimg) {
-    $faceimg = $DB->get_record('attendance_images', array('studentid' => $USER->id, 'groupimg' => $groupimg->groupimg, 'approved' => 0, 'tag' => 0));
+    $faceimg = $DB->get_record('attendance_images', array('studentid' => $USER->id, 'groupimg' => $groupimg->groupimg));
     if ($faceimg != false) {
         $faceimgrec = $faceimg;
         break;
@@ -72,6 +72,8 @@ if ($mform->is_cancelled()) {
 } else if ($fromform = $mform->get_data()) {
     if (!empty($fromform->changebutton)) {
         $faceimgrec->studentid = 0;
+        $faceimgrec->tag = 0;
+        $faceimgrec->approved = 0;
         $success = $DB->update_record('attendance_images', $faceimgrec);
         $refresh = new moodle_url('/mod/attendance/attendance.php', array('sessid' => $id, 'sesskey' => sesskey()));
         redirect($refresh);
