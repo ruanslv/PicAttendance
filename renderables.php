@@ -43,6 +43,7 @@ class attendance_tabs implements renderable {
     const TAB_EXPORT        = 4;
     const TAB_PREFERENCES   = 5;
     const TAB_TRAIN         = 6;
+    const TAB_APPROVE       = 7;
 
     public $currenttab;
 
@@ -98,6 +99,13 @@ class attendance_tabs implements renderable {
         if ($this->att->perm->can_manage()) {
             $toprow[] = new tabobject(self::TAB_TRAIN, $this->att->url_train()->out(),
                         'Train');
+        }
+        
+        // Ver quais permissoes colocar
+        // Adicionar get_string('approve', 'attendance')
+        if ($this->att->perm->can_manage()) {
+            $toprow[] = new tabobject(self::TAB_APPROVE, $this->att->url_approve()->out(),
+                        'Approve');
         }
         
         return array($toprow);
@@ -264,6 +272,44 @@ class attendance_train_data implements renderable {
         $this->pageparams = $att->pageparams;
        
         $this->urlpath = $att->url_train()->out_omit_querystring();
+        $params = $att->pageparams->get_significant_params();
+        $params['id'] = $att->cm->id;
+        $this->urlparams = $params;
+        $this->att = $att;
+    }
+    
+    public function url($params=array(), $excludeparams=array()) {
+        $params = array_merge($this->urlparams, $params);
+
+        foreach ($excludeparams as $paramkey) {
+            unset($params[$paramkey]);
+        }
+
+        return new moodle_url($this->urlpath, $params);
+    }
+
+    public function url_view($params=array()) {
+        return url_helpers::url_view($this->att, $params);
+    }
+
+    public function url_path() {
+        return $this->urlpath;
+    }
+}
+
+class attendance_approve_data implements renderable {
+    public $pageparams;
+    public $perm;
+    
+    private $urlpath;
+    private $urlparams;
+    private $att;
+    
+    public function __construct(attendance $att) {
+        $this->perm = $att->perm;
+        $this->pageparams = $att->pageparams;
+       
+        $this->urlpath = $att->url_approve()->out_omit_querystring();
         $params = $att->pageparams->get_significant_params();
         $params['id'] = $att->cm->id;
         $this->urlparams = $params;
@@ -624,5 +670,15 @@ class url_helpers {
 
     public static function url_view($att, $params=array()) {
         return $att->url_view($params);
+    }
+}
+
+class attendance_image_tagging_data implements renderable {
+    public $imageurl;
+    public $actionurl;
+  
+    public function  __construct($imageurl, $actionurl) {
+      $this->imageurl = $imageurl;
+      $this->actionurl = $actionurl;
     }
 }

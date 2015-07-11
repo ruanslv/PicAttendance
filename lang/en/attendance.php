@@ -231,6 +231,6 @@ $string['studentscanmark_help'] = 'If checked students will be able to change th
 $string['set_by_student'] = 'Self-recorded';
 $string['attendance_already_submitted'] = 'You may not self register attendance that has already been set.';
 $string['lowgrade'] = 'Low grade';
-$string['submitattendance'] = 'Submit attendance';
+$string['submitattendance'] = 'Confirm attendance';
 $string['attendancenotset'] = 'You must set your attendance';
 $string['export'] = 'Export';

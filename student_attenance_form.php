@@ -18,7 +18,7 @@ require_once($CFG->libdir.'/formslib.php');
 
 class mod_attendance_student_attendance_form extends moodleform {
     public function definition() {
-        global $CFG, $USER;
+        global $CFG, $DB, $USER;
 
         $mform  =& $this->_form;
 
@@ -27,6 +27,7 @@ class mod_attendance_student_attendance_form extends moodleform {
         $modcontext = $this->_customdata['modcontext'];
         $attforsession = $this->_customdata['session'];
         $attblock = $this->_customdata['attendance'];
+        $faceimg = $this->_customdata['faceimg'];
 
         $statuses = $attblock->get_statuses();
 
@@ -48,16 +49,20 @@ class mod_attendance_student_attendance_form extends moodleform {
         if (!empty($attforsession->description)) {
             $mform->addElement('html', $attforsession->description);
         }
-
-        // Create radio buttons for setting the attendance status.
-        $radioarray = array();
-        foreach ($statuses as $status) {
-            $radioarray[] =& $mform->createElement('radio', 'status', '', $status->description, $status->id, array());
-        }
-        // Add the radio buttons as a control with the user's name in front.
-        $mform->addGroup($radioarray, 'statusarray', $USER->firstname.' '.$USER->lastname.':', array(''), false);
-        $mform->addRule('statusarray', get_string('attendancenotset', 'attendance'), 'required', '', 'client', false, false);
         
-        $this->add_action_buttons();
+        //$group = array();
+        $coursecontext = context_course::instance($course->id);
+        $url = moodle_url::make_pluginfile_url($coursecontext->id, 'mod_attendance', 'myarea', 0, '/', $faceimg);
+        //$group[] =& $mform->createElement('html', "<img src=\"$url\" />");
+        //$mform->addGroup($group, 'ratinggroup', '', ' ', false);
+        $mform->addElement('html', "<img src=\"$url\" />");
+                
+        $change_string = 'Change photo';
+        // Add get_string('savechanges')
+        $mform->addElement('submit', 'changebutton', $change_string);
+        
+        // add get_string
+        $submit_string = 'Confirm';
+        $this->add_action_buttons(true, $submit_string);
     }
 }

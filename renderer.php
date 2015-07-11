@@ -328,6 +328,26 @@ class mod_attendance_renderer extends plugin_renderer_base {
         return html_writer::table($table);
     }
 
+    protected function render_attendance_approve_data(attendance_approve_data $approvedata) {
+        $table = new html_table();
+        $table->attributes['class'] = ' ';
+
+        // Adiciona botao do PicAttendance
+        $form = html_writer::empty_tag('br');
+        $form .= html_writer::empty_tag('br');
+        $form .= html_writer::start_tag('form', array('action' => $approvedata->url(array('sesskey' => sesskey(), 'page' => $approvedata->pageparams->page)), 'method' => 'post', 'enctype' => "multipart/form-data"));
+        // $form .= html_writer::start_tag('form', array('action' => 'upload.php', 'method' => 'post', 'enctype' => "multipart/form-data"));
+        $form .= "PicAttendance: ";
+        $form .= html_writer::empty_tag('input', array('type' => 'file', 'id' => 'fileToUpload', 'name' => 'fileToUpload'));
+        // usar get_string('updatelangs','tool_langimport')
+        $form .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Upload Image', 'name' => 'tatu'));
+        $form .= html_writer::end_tag('form');
+
+        $table->data[0][] = $form;
+
+        return html_writer::table($table);
+    }
+
     protected function render_attendance_take_data(attendance_take_data $takedata) {
         $controls = $this->render_attendance_take_controls($takedata);
 
@@ -1054,4 +1074,24 @@ class mod_attendance_renderer extends plugin_renderer_base {
         return html_writer::empty_tag('input', $attributes);
     }
 
+    protected function render_attendance_image_tagging_data(attendance_image_tagging_data $imagetaggingdata) {
+      $htmltext = html_writer::start_tag('script', array('type' => 'text/javascript', 'src' => 'https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'));
+      $htmltext .= html_writer::end_tag('script');
+      $htmltext .= html_writer::empty_tag('link', array('rel' => 'stylesheet', 'href' => 'tagging.css', 'type' => 'text/css'));
+      $htmltext .= html_writer::start_tag('div', array('id' => 'container'));
+      $htmltext .= html_writer::empty_tag('img', array('id' => 'img', 'class' => 'img', 'src' => $imagetaggingdata->imageurl, 'onload' => 'callLoad()'));
+      $htmltext .= html_writer::start_tag('canvas', array('id' => 'canvas'));
+      $htmltext .= html_writer::end_tag('canvas');
+      $htmltext .= html_writer::end_tag('div');
+      $htmltext .= html_writer::start_tag('form', array('action' => $imagetaggingdata->actionurl, 'method' => 'post'));
+      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'x'));
+      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'y'));
+      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'width'));
+      $htmltext .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'height'));
+      $htmltext .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Submit Tagging', 'name' => 'tatu'));
+      $htmltext .= html_writer::end_tag('form');
+      $htmltext .= html_writer::start_tag('script', array('type' => 'text/javascript', 'src' => 'tagging.js'));
+      $htmltext .= html_writer::end_tag('script');
+      return $htmltext;
+    }
 }

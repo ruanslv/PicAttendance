@@ -555,6 +555,36 @@ class att_train_page_params extends att_page_with_filter_controls {
     }
 }
 
+class att_approve_page_params extends att_page_with_filter_controls {
+    public $group;
+    public $sort;
+
+    public function  __construct() {
+        $this->selectortype = self::SELECTOR_GROUP;
+    }
+
+    public function init($cm) {
+        parent::init($cm);
+
+        if (!isset($this->group)) {
+            $this->group = $this->get_current_sesstype() > 0 ? $this->get_current_sesstype() : 0;
+        }
+        if (!isset($this->sort)) {
+            $this->sort = ATT_SORT_LASTNAME;
+        }
+    }
+
+    public function get_significant_params() {
+        $params = array();
+
+        if ($this->sort != ATT_SORT_LASTNAME) {
+            $params['sort'] = $this->sort;
+        }
+
+        return $params;
+    }
+}
+
 class attendance {
     const SESSION_COMMON        = 0;
     const SESSION_GROUP         = 1;
@@ -806,6 +836,14 @@ class attendance {
     }
 
     /**
+     * @return moodle_url of attsettings.php for attendance instance
+     */
+    public function url_approve($params=array()) {
+        $params = array_merge(array('id' => $this->cm->id), $params);
+        return new moodle_url('/mod/attendance/approve.php', $params);
+    }
+
+    /**
      * @return moodle_url of attendances.php for attendance instance
      */
     public function url_take($params=array()) {
@@ -893,7 +931,8 @@ class attendance {
 
         $record = new stdClass();
         $record->studentid = $USER->id;
-        $record->statusid = $mformdata->status;
+        // Marca como presente!
+        $record->statusid = 5;
         $record->statusset = $statuses;
         $record->remarks = get_string('set_by_student', 'mod_attendance');
         $record->sessionid = $mformdata->sessid;

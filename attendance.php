@@ -30,8 +30,6 @@ $pageparams = new att_sessions_page_params();
 
 // Check that the required parameters are present.
 $id = required_param('sessid', PARAM_INT);
-$attendance_session_id = required_param('sessid', PARAM_INT);
-
 
 $attforsession = $DB->get_record('attendance_sessions', array('id' => $id), '*', MUST_EXIST);
 $attendance = $DB->get_record('attendance', array('id' => $attforsession->attendanceid), '*', MUST_EXIST);
@@ -47,29 +45,50 @@ $att = new attendance($attendance, $cm, $course, $PAGE->context, $pageparams);
 // Require that a session key is passed to this page.
 require_sesskey();
 
+$tag_url = new moodle_url('/mod/attendance/tagging.php', array('sessid' => $id, 'sesskey' => sesskey()));
+$groupimgs = $DB->get_records('attendance_session_images', array('sessionid' => $id));
+
+$faceimgrec = false;
+foreach ($groupimgs as $groupimg) {
+    $faceimg = $DB->get_record('attendance_images', array('studentid' => $USER->id, 'groupimg' => $groupimg->groupimg, 'approved' => 0, 'tag' => 0));
+    if ($faceimg != false) {
+        $faceimgrec = $faceimg;
+        break;
+    }
+}
+if ($faceimgrec == false) {
+    redirect($tag_url);
+}
+
 // Create the form.
 $mform = new mod_attendance_student_attendance_form(null,
-        array('course' => $course, 'cm' => $cm, 'modcontext' => $PAGE->context, 'session' => $attforsession, 'attendance' => $att));
+        array('course' => $course, 'cm' => $cm, 'modcontext' => $PAGE->context,
+        'session' => $attforsession, 'attendance' => $att, 'faceimg' => $faceimgrec->faceimg));
 
 if ($mform->is_cancelled()) {
     // The user cancelled the form, so redirect them to the view page.
     $url = new moodle_url('/mod/attendance/view.php', array('id' => $cm->id));
     redirect($url);
 } else if ($fromform = $mform->get_data()) {
-    if (!empty($fromform->status)) {
+    if (!empty($fromform->changebutton)) {
+        $faceimgrec->studentid = 0;
+        $success = $DB->update_record('attendance_images', $faceimgrec);
+        $refresh = new moodle_url('/mod/attendance/attendance.php', array('sessid' => $id, 'sesskey' => sesskey()));
+        redirect($refresh);
+    } else {
         $success = $att->take_from_student($fromform);
 
         $url = new moodle_url('/mod/attendance/view.php', array('id' => $cm->id));
         if ($success) {
-            // Redirect back to the view page for the block.
-            redirect($url);
+        // Redirect back to the view page for the block.
+        redirect($url);
         } else {
             print_error ('attendance_already_submitted', 'mod_attendance', $url);
         }
     }
-
+    
     // The form did not validate correctly so we will set it to display the data they submitted.
-    $mform->set_data($fromform);
+    // $mform->set_data($fromform);
 }
 
 $PAGE->set_url($att->url_sessions());

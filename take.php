@@ -56,7 +56,6 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
     if(isset($_POST["tatu"])) {
         $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
         if($check !== false) {
-            echo "File is an imageeee - " . $check["mime"] . ".";
             $image_file = fopen($_FILES["fileToUpload"]['tmp_name'], 'rb');
             $image = fread($image_file, 20000000);
             if (!$image) {
@@ -82,7 +81,7 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                 $fs->create_file_from_string($fileinfo, $image);
               }
               
-              $select = "approved = '1' AND studentid <> '0'";
+              $select = "approved = '1' AND detected = '1' AND studentid <> '0'";
               $results = $DB->get_records_select('attendance_images', $select, null, 'faceimg, studentid');
    
               $labeled_faces = array();
@@ -157,13 +156,12 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                   $fs_record->studentid = $face["label"];
                   // append
                   $lastinsertid = $DB->insert_record('attendance_images', $fs_record, false);
-                  
-                  $sess_record = new stdClass();
-                  $sess_record->groupimg = $group_img_name;
-                  $sess_record->sessionid = $pageparams->sessionid;
-                  $lastinsertid = $DB->insert_record('attendance_session_images', $sess_record, false);
                 }
-              } 
+              }
+              $sess_record = new stdClass();
+              $sess_record->groupimg = $group_img_name;
+              $sess_record->sessionid = $pageparams->sessionid;
+              $lastinsertid = $DB->insert_record('attendance_session_images', $sess_record, false);
             }
             $uploadOk = 1;
         } else {

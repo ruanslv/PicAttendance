@@ -109,12 +109,12 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                   // append
                   $lastinsertid = $DB->insert_record('attendance_images', $fs_record, false);
                   
-                  $sess_record = new stdClass();
-                  $sess_record->groupimg = $group_img_name;
-                  // Imagens para training tem sessionid = 0
-                  $lastinsertid = $DB->insert_record('attendance_session_images', $sess_record, false);
                 }
               }
+              $sess_record = new stdClass();
+              $sess_record->groupimg = $group_img_name;
+              // Imagens para training tem sessionid = 0
+              $lastinsertid = $DB->insert_record('attendance_session_images', $sess_record, false);
             }
             $uploadOk = 1;
             // COLOCAR: redirect($att->url_manage(), get_string('sessionupdated', 'attendance'));
