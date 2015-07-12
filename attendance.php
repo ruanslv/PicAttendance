@@ -50,20 +50,40 @@ $groupimgs = $DB->get_records('attendance_session_images', array('sessionid' => 
 
 $faceimgrec = false;
 foreach ($groupimgs as $groupimg) {
-    $faceimg = $DB->get_record('attendance_images', array('studentid' => $USER->id, 'groupimg' => $groupimg->groupimg));
+    $faceimg = $DB->get_record('attendance_images', array('studentid' => $USER->id, 'groupimg' => $groupimg->groupimg, 'tag' => 1));
     if ($faceimg != false) {
         $faceimgrec = $faceimg;
         break;
     }
 }
-if ($faceimgrec == false) {
-    redirect($tag_url);
+$tag = 0;
+// Imagem ja tageada foi identificada
+if ($faceimgrec != false) {
+    $tag = 1;
+} else {
+    foreach ($groupimgs as $groupimg) {
+        $faceimg = $DB->get_record('attendance_images', array('studentid' => $USER->id, 'groupimg' => $groupimg->groupimg));
+        if ($faceimg != false) {
+            $faceimgrec = $faceimg;
+            break;
+        }
+    }
 }
 
+// Nenhuma face foi detectada
+if ($faceimgrec == false && !empty($groupimgs)) {
+    redirect($tag_url);
+} 
 // Create the form.
-$mform = new mod_attendance_student_attendance_form(null,
+if ($faceimgrec != false) {
+    $mform = new mod_attendance_student_attendance_form(null,
         array('course' => $course, 'cm' => $cm, 'modcontext' => $PAGE->context,
-        'session' => $attforsession, 'attendance' => $att, 'faceimg' => $faceimgrec->faceimg));
+        'session' => $attforsession, 'attendance' => $att, 'faceimg' => $faceimgrec->faceimg, 'tag' => $tag));
+} else {
+    $mform = new mod_attendance_student_attendance_form(null,
+        array('course' => $course, 'cm' => $cm, 'modcontext' => $PAGE->context,
+        'session' => $attforsession, 'attendance' => $att, 'tag' => $tag));
+}
 
 if ($mform->is_cancelled()) {
     // The user cancelled the form, so redirect them to the view page.
@@ -78,7 +98,7 @@ if ($mform->is_cancelled()) {
         $refresh = new moodle_url('/mod/attendance/attendance.php', array('sessid' => $id, 'sesskey' => sesskey()));
         redirect($refresh);
     } else {
-        $success = $att->take_from_student($fromform);
+        $success = $att->take_from_student($fromform->sessid, $USER->id);
 
         $url = new moodle_url('/mod/attendance/view.php', array('id' => $cm->id));
         if ($success) {

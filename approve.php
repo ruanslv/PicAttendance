@@ -57,6 +57,8 @@ if ($fromform = $mform->get_data()) {
         $dataobject = $DB->get_record('attendance_images', array('id' => intval($value)));
         if ($key == 'yes') {
             $dataobject->approved = 1;
+            $sessrec = $DB->get_record('attendance_session_images', array('groupimg' => $dataobject->groupimg));
+            $success = $att->take_from_student($sessrec->sessionid, $dataobject->studentid);
         } else {
             $dataobject->studentid = 0;
             $dataobject->tag = 0;

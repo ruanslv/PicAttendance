@@ -383,6 +383,8 @@ class mod_attendance_renderer extends plugin_renderer_base {
     }
 
     protected function render_attendance_take_controls(attendance_take_data $takedata) {
+        global $DB; 
+        
         $table = new html_table();
         $table->attributes['class'] = ' ';
 
@@ -401,6 +403,21 @@ class mod_attendance_renderer extends plugin_renderer_base {
         $form .= html_writer::end_tag('form');
 
         $table->data[0][] = $form;
+    
+        $photorecords = $DB->get_records('attendance_session_images', array('sessionid' => $takedata->sessioninfo->id));
+        $course = $DB->get_record('course', array('id' => $takedata->cm->course), '*', MUST_EXIST);
+        $coursecontext = context_course::instance($course->id);
+
+        $i = 1;
+        foreach($photorecords as $photorec) {
+            $url = moodle_url::make_pluginfile_url($coursecontext->id, 'mod_attendance', 'myarea', 0, '/', $photorec->groupimg);
+            $cell = new html_table_cell(html_writer::start_tag('img', array('src' => $url, 'width' => '600', height => auto)));
+            $cell->colspan = 3;
+            //$img = html_writer::start_tag('img', array('colspan' => 3, 'src' => $url, 'width' => '1000', height => auto));
+            //$img .= html_writer::end_tag('img');
+            $table->data[$i][] = $cell;
+            $i++;
+        }
 
         return $this->output->container(html_writer::table($table), 'generalbox takecontrols');
     }
@@ -729,11 +746,47 @@ class mod_attendance_renderer extends plugin_renderer_base {
     }
 
     private function construct_user_data(attendance_user_data $userdata) {
+        global $DB;       
+       
         $o = html_writer::tag('h2', fullname($userdata->user));
+        $o .= html_writer::empty_tag('link', array('rel' => 'stylesheet', 'href' => 'jquery-ui.min.css'));
+        $o .= html_writer::start_tag('script', array('src' => 'external/jquery/jquery.js'));
+        $o .= html_writer::end_tag('script');
+        $o .= html_writer::start_tag('script', array('src' => 'jquery-ui.min.js'));
+        $o .= html_writer::end_tag('script');
+        $o .= html_writer::start_tag('script', array('src' => 'untag.js'));
+        $o .= html_writer::end_tag('script');
+
+        // RUAN ////////////////////////
+        // Se você quiser mudar a pagina para onde o untag vai, é só mudar essa variavel aqui:
+        $untagurl =  new moodle_url($userdata->urlpath, $userdata->urlparams);
 
         if ($userdata->pageparams->mode == att_view_page_params::MODE_THIS_COURSE) {
             $o .= html_writer::empty_tag('hr');
+            
+           
+            $photorecords = $DB->get_records('attendance_images', array('studentid' => intval($userdata->user->id)));
+            if (!empty($photorecords)) {
+                $o .= html_writer::tag('h5', 'These are the photos we think it\'s you. Click on one to untag yourself. ');
+                // PicAttendance
+                $table = new html_table();
+                // $course = $DB->get_record('course', array('id' => $userdata->pageparams->course), '*', MUST_EXIST);
+                
+                $coursecontext = context_course::instance($userdata->courseid);
+                
+                $row = new html_table_row();
+                foreach($photorecords as $photorec) {
+                    $url = moodle_url::make_pluginfile_url($coursecontext->id, 'mod_attendance', 'myarea', 0, '/', $photorec->faceimg);
+                    $cell = new html_table_cell(html_writer::start_tag('img', array('src' => $url, 'width' => '80', height => auto, 'id' => $photorec->faceimg, 'onclick' => "dialog('" . $photorec->faceimg . "', '$untagurl')")));
+                    $row->cells[] = $cell;
+                }
+                $table->data[] = $row;
+    
+                $o .= html_writer::table($table);
+            }
+            
 
+            
             $o .= construct_user_data_stat($userdata->stat, $userdata->statuses,
                         $userdata->gradable, $userdata->grade, $userdata->maxgrade, $userdata->decimalpoints);
                         //$userdata->sessionslog[0]->id, sesskey())); //picattendance: sessid aleatorio

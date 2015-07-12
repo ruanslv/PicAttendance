@@ -216,10 +216,24 @@ function construct_session_full_date_time($datetime, $duration) {
 }
 
 function construct_user_data_stat($stat, $statuses, $gradable, $grade, $maxgrade, $decimalpoints) {
-    global $OUTPUT;
+    global $OUTPUT, $DB;
 
     $stattable = new html_table();
     $stattable->attributes['class'] = 'attlist';
+
+    // PicAttendance - falta studentid e cm
+    /*$photorecords = $DB->get_records('attendance_images', array('studentid' => $studentid));
+    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $coursecontext = context_course::instance($course->id);
+    
+    $row = new html_table_row();
+    foreach($photorecords as $photorec) {
+        $url = moodle_url::make_pluginfile_url($coursecontext->id, 'mod_attendance', 'myarea', 0, '/', $photorec->faceimg);
+        $cell = new html_table_cell(html_writer::start_tag('img', array('src' => $url, 'width' => '80', height => auto)));
+        $row->cells[] = $cell;
+    }
+    $stattable->data[] = $row;*/
+    
     $row = new html_table_row();
     $row->cells[] = get_string('sessionscompleted', 'attendance').':';
     $row->cells[] = $stat['completed'];
@@ -250,21 +264,7 @@ function construct_user_data_stat($stat, $statuses, $gradable, $grade, $maxgrade
         $row->cells[] = sprintf("%0.{$decimalpoints}f", $percent);
         $stattable->data[] = $row;
     }
-    
-     // PicAttendance
-    /*
-    $url = new moodle_url('/mod/attendance/train_student.php', array('sessid' => $sessid, 'sesskey' => $sesskey));
-    $form = html_writer::empty_tag('br');
-    $form .= "PicAttendance: ";
-    $form .= html_writer::start_tag('form', array('action' => $url));
-    // usar get_string('updatelangs','tool_langimport')
-    $form .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Train'));
-    $form .= html_writer::end_tag('form');
-
-    $row = new html_table_row();
-    $row->cells[] = $form;
-    $stattable->data[] = $row;
-    */
+ 
     return html_writer::table($stattable);
 }
 

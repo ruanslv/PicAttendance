@@ -50,9 +50,9 @@ class mod_attendance_student_tag_form extends moodleform {
 
         $coursecontext = context_course::instance($course->id);
         $contextmodule = context_module::instance($cm->id);
-        $fs = get_file_storage();
         
         /*
+        $fs = get_file_storage();
         $files = $fs->get_area_files($coursecontext->id, 'mod_attendance', 'myarea', 0);
         foreach ($files as $file) {
             // $f is an instance of stored_file
@@ -62,8 +62,6 @@ class mod_attendance_student_tag_form extends moodleform {
             echo "<img src=\"$url\"/>";
         }*/
         
-        $coursecontext = context_course::instance($course->id);
-
         if ($this->_customdata['radio']) {
             $records = $DB->get_records('attendance_images', array('tag' => 1, 'approved' => 0));
             foreach ($records as $record) {
@@ -73,13 +71,13 @@ class mod_attendance_student_tag_form extends moodleform {
                 $group = array();
                 foreach ($personalrecs as $personalrec) {
                     $url = moodle_url::make_pluginfile_url($coursecontext->id, 'mod_attendance', 'myarea', 0, '/', $personalrec->faceimg);
-                    $group[] =& $mform->createElement('html', "<img src=\"$url\" />");
+                    $group[] =& $mform->createElement('html', "<img src=\"$url\" width=\"80\" height=\"80\" />");
                     //$group[] =& $mform->createElement('radio', 'yes', '', $personalrec->faceimg, $record->id, array());
                 }
                 $mform->addGroup($group, 'oldpics', '', ' ', false);
                 $group = array();
                 $url = moodle_url::make_pluginfile_url($coursecontext->id, 'mod_attendance', 'myarea', 0, '/', $face2approve);
-                $group[] =& $mform->createElement('html', "<img src=\"$url\" />");
+                $group[] =& $mform->createElement('html', "<img src=\"$url\" width=\"80\" height=\"80\" />");
                 $group[] =& $mform->createElement('radio', 'yes', '', 'Yes', $record->id, array());
                 $group[] =& $mform->createElement('radio', 'no', '', 'No', $record->id, array());
                 $mform->addGroup($group, 'newpic', '', ' ', false);
@@ -110,7 +108,7 @@ class mod_attendance_student_tag_form extends moodleform {
                     $faceimg = $faceimgrec->faceimg;
                     $group = array();
                     $url = moodle_url::make_pluginfile_url($coursecontext->id, 'mod_attendance', 'myarea', 0, '/', $faceimg);
-                    $group[] =& $mform->createElement('html', "<img src=\"$url\" />");
+                    $group[] =& $mform->createElement('html', "<img src=\"$url\" width=\"80\" height=\"80\" />");
                     $group[] =& $mform->createElement('checkbox', $faceimg, 'LOL2');
                     $mform->addGroup($group, 'ratinggroup', '', ' ', false);
                 }

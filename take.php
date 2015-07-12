@@ -79,6 +79,11 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
               if (!$fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
                       $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename'])) {
                 $fs->create_file_from_string($fileinfo, $image);
+                
+                $sess_record = new stdClass();
+                $sess_record->groupimg = $group_img_name;
+                $sess_record->sessionid = $pageparams->sessionid;
+                $lastinsertid = $DB->insert_record('attendance_session_images', $sess_record, false);
               }
               
               $select = "approved = '1' AND detected = '1' AND studentid <> '0'";
@@ -137,11 +142,21 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                   // $face["rectangle"]["width"]
                   // $face["rectangle"]["height"]
                   // $face["label"]
-                  
+                     
                   //////////////////////////////////////////////////////////////
                   // TODO: Usar o valor da $face["label"] para escrever no BD
                   /// observe que $face["label"] é 0 para nao deteccao
                   //////////////////////////////////////////////////////////////
+                  // Caso a pessoa ja tenha sido reconhecida nesta sessao nao adicionar novo record
+                  $old_records = $DB->get_records('attendance_images', array('studentid' => $face["label"]));
+                  $aux = true;
+                  foreach ($old_records as $old_record) {
+                      $old_sess = $DB->get_record('attendance_session_images', array('groupimg' => $old_record->groupimg));
+                      if ($old_sess != false) {
+                          $aux = false;
+                          break;
+                      }
+                  }
                   $fs_record = new stdClass();
                   
                   $fs_record->groupimg = $group_img_name;
@@ -153,15 +168,15 @@ if (($formdata = data_submitted()) && confirm_sesskey()) {
                   $fs_record->y = $face["rectangle"]["y"];
                   $fs_record->width = $face["rectangle"]["width"];
                   $fs_record->length = $face["rectangle"]["height"];
-                  $fs_record->studentid = $face["label"];
+                  if ($aux) {
+                    $fs_record->studentid = $face["label"];
+                  } else {
+                    $fs_record->studentid = 0;
+                  }
                   // append
                   $lastinsertid = $DB->insert_record('attendance_images', $fs_record, false);
                 }
               }
-              $sess_record = new stdClass();
-              $sess_record->groupimg = $group_img_name;
-              $sess_record->sessionid = $pageparams->sessionid;
-              $lastinsertid = $DB->insert_record('attendance_session_images', $sess_record, false);
             }
             $uploadOk = 1;
         } else {

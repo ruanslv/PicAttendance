@@ -28,6 +28,7 @@ class mod_attendance_student_attendance_form extends moodleform {
         $attforsession = $this->_customdata['session'];
         $attblock = $this->_customdata['attendance'];
         $faceimg = $this->_customdata['faceimg'];
+        $tag = $this->_customdata['tag'];
 
         $statuses = $attblock->get_statuses();
 
@@ -50,19 +51,27 @@ class mod_attendance_student_attendance_form extends moodleform {
             $mform->addElement('html', $attforsession->description);
         }
         
-        //$group = array();
-        $coursecontext = context_course::instance($course->id);
-        $url = moodle_url::make_pluginfile_url($coursecontext->id, 'mod_attendance', 'myarea', 0, '/', $faceimg);
-        //$group[] =& $mform->createElement('html', "<img src=\"$url\" />");
-        //$mform->addGroup($group, 'ratinggroup', '', ' ', false);
-        $mform->addElement('html', "<img src=\"$url\" />");
-                
-        $change_string = 'Change photo';
-        // Add get_string('savechanges')
-        $mform->addElement('submit', 'changebutton', $change_string);
-        
-        // add get_string
-        $submit_string = 'Confirm';
-        $this->add_action_buttons(true, $submit_string);
+        if (!empty($faceimg)) {
+            //$group = array();
+            $coursecontext = context_course::instance($course->id);
+            $url = moodle_url::make_pluginfile_url($coursecontext->id, 'mod_attendance', 'myarea', 0, '/', $faceimg);
+            //$group[] =& $mform->createElement('html', "<img src=\"$url\" />");
+            //$mform->addGroup($group, 'ratinggroup', '', ' ', false);
+            $mform->addElement('html', "<img src=\"$url\" />");
+                    
+            $change_string = 'Change photo';
+            // Add get_string('savechanges')
+            $mform->addElement('submit', 'changebutton', $change_string);
+            
+            if ($tag == 1) {
+                $mform->addElement('static', '', 'Teacher approval pending.', '');
+            } else {
+                // add get_string
+                $submit_string = 'Confirm';
+                $this->add_action_buttons(true, $submit_string);
+            }
+        } else {
+            $mform->addElement('static', '', 'No images added for this session.', '');
+        }
     }
 }

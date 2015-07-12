@@ -915,31 +915,68 @@ class attendance {
         $event->trigger();
     }
 
+    public function remove_from_student($sessid, $studentid) {
+        global $DB;
+
+        $now = time();
+
+        $dbsesslog = $DB->delete_records('attendance_log', array('sessionid' => $sessid, 'studentid' => $studentid));
+
+        // Update the session to show that a register has been taken, or staff may overwrite records.
+        $session = $this->get_session_info($sessid);
+        $session->lasttaken = $now;
+        $session->lasttakenby = $studentid;
+        $DB->update_record('attendance_sessions', $session);
+
+        // Update the users grade.
+        $this->update_users_grade(array($studentid));
+
+        /* create url for link in log screen
+         * need to set grouptype to 0 to allow take attendance page to be called
+         * from report/log page */
+
+        $params = array(
+                'sessionid' => $sessid,
+                'grouptype' => 0);
+
+        // Log the change.
+        $event = \mod_attendance\event\attendance_taken_by_student::create(array(
+            'objectid' => $this->id,
+            'context' => $this->context,
+            'other' => $params));
+        $event->add_record_snapshot('course_modules', $this->cm);
+        $event->add_record_snapshot('attendance_sessions', $session);
+        // $event->add_record_snapshot('attendance_log', $record);
+        $event->trigger();
+
+        return true;
+    }
+
     /**
      * Used to record attendance submitted by the student.
      *
      * @global type $DB
-     * @global type $USER
-     * @param type $mformdata
+     * @param type $studentid
+     * @param type $sessid
      * @return boolean
      */
-    public function take_from_student($mformdata) {
-        global $DB, $USER;
+    public function take_from_student($sessid, $studentid) {
+        global $DB;
 
         $statuses = implode(',', array_keys( (array)$this->get_statuses() ));
         $now = time();
 
         $record = new stdClass();
-        $record->studentid = $USER->id;
+        $record->studentid = $studentid;
         // Marca como presente!
         $record->statusid = 5;
         $record->statusset = $statuses;
         $record->remarks = get_string('set_by_student', 'mod_attendance');
-        $record->sessionid = $mformdata->sessid;
+        $record->sessionid = $sessid;
         $record->timetaken = $now;
-        $record->takenby = $USER->id;
+        $record->takenby = $studentid;
 
-        $dbsesslog = $this->get_session_log($mformdata->sessid);
+        $dbsesslog = $this->get_session_log($sessid);
         if (array_key_exists($record->studentid, $dbsesslog)) {
             // Already recorded do not save.
             return false;
@@ -949,20 +986,20 @@ class attendance {
         }
 
         // Update the session to show that a register has been taken, or staff may overwrite records.
-        $session = $this->get_session_info($mformdata->sessid);
+        $session = $this->get_session_info($sessid);
         $session->lasttaken = $now;
-        $session->lasttakenby = $USER->id;
+        $session->lasttakenby = $studentid;
         $DB->update_record('attendance_sessions', $session);
 
         // Update the users grade.
-        $this->update_users_grade(array($USER->id));
+        $this->update_users_grade(array($studentid));
 
         /* create url for link in log screen
          * need to set grouptype to 0 to allow take attendance page to be called
          * from report/log page */
 
         $params = array(
-                'sessionid' => $this->pageparams->sessionid,
+                'sessionid' => $sessid,
                 'grouptype' => 0);
 
         // Log the change.

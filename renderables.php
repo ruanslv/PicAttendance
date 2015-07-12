@@ -440,11 +440,13 @@ class attendance_user_data implements renderable {
 
     public $coursesatts;
 
-    private $urlpath;
-    private $urlparams;
+    public $courseid;
+
+    public $urlpath;
+    public $urlparams;
 
     public function  __construct(attendance $att, $userid) {
-        global $CFG, $USER;
+        global $CFG, $USER, $DB;
 
         $this->user = $att->get_user($userid);
 
@@ -512,6 +514,8 @@ class attendance_user_data implements renderable {
         $this->urlpath = $att->url_view()->out_omit_querystring();
         $params = $att->pageparams->get_significant_params();
         $params['id'] = $att->cm->id;
+        $course = $DB->get_record('course', array('id' => $att->cm->course), '*', MUST_EXIST);
+        $this->courseid = $course->id;
         $this->urlparams = $params;
     }
 

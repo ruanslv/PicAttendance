@@ -72,6 +72,28 @@ if (isset($pageparams->studentid) && $USER->id != $pageparams->studentid) {
     $userid = $USER->id;
 }
 
+if ($formdata = data_submitted()) {
+    if(isset($_POST["untaghash"])) {
+        $faceimg = $_POST["untaghash"];
+        $groupimgrec = $DB->get_record('attendance_images', array('faceimg' => $faceimg));
+        $sessrec = $DB->get_record('attendance_session_images', array('groupimg' => $groupimgrec->groupimg));
+        
+        $sessid = $sessrec->sessionid;
+        $studentid = $groupimgrec->studentid;
+        
+        // Atualiza linha do BD
+        $groupimgrec->studentid = 0;
+        $groupimgrec->tag = 0;
+        $groupimgrec->approved = 0;
+        $success = $DB->update_record('attendance_images', $groupimgrec);
+        
+        // Retorna attendance ao estado default - caso nao seja imagem de training
+        if ($sessid != 0) {
+            $success = $att->remove_from_student($sessid, $studentid);
+        }
+    }
+}
+
 $userdata = new attendance_user_data($att, $userid);
 
 echo $output->header();
