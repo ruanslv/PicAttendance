@@ -2,7 +2,7 @@
 
 Final year project developed by Thiago Caetano and Ruan Silva at University of Campinas, Brazil.
 
-This module was based on "Attendance" (https://github.com/danmarsden/moodle-mod_attendance) and it may be distributed under the terms of the General Public License.
+This module was based on "Attendance" (https://github.com/danmarsden/moodle-mod_attendance) and it may be distributed under the terms of the GNU General Public License.
 
 # Description
 
