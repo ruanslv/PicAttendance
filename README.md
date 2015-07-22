@@ -1,18 +1,22 @@
-# Awesome, you've just made a new workspace!
-Workspaces are fantastic for organizing your work. This new workspace, which lives inside the 'Workspaces' folder of your home
-directory, is a place where you can store all relevant and related files to a particular project. For example, if you
-are working on multiple projects, its nice to have them separated as follows:
--|home dir
-   -|Workspaces
-    -| Project 1
-    -| Project 2
-    -| Project 3
+# PicAttendance - Moodle plugin
 
-Workspaces help keep your projects organized. You can create any number of workspaces. There are no limits.
+Final year project developed by Thiago Caetano and Ruan Silva at University of Campinas, Brazil.
 
-Note: A workspace folder is just a regular folder so you can create any number of files and folders inside it.
+This module was based on "Attendance" (https://github.com/danmarsden/moodle-mod_attendance) and it may be distributed under the terms of the GNU General Public License.
 
-As you move back and forth between your workspaces, Koding will remember everything about each workspace. This includes things
-like IDE settings, files open, Terminals open, etc.
+# Description
 
-Enjoy and Happy Koding!
+PicAttendance works similarly as the Attendance plugin with the additional functionality of taking the attendance of students using photos from the class. Using OpenCV, the plugin detects the faces present in the photo and recognizes the students in class based on a pre-populated database. There is also a tagging system so that students can identify themselves in the photos when the system does not recognize them. In order to avoid frauds, the instructor needs to approve tags that were manually added by the students.
+
+For full documentation, read our thesis in the doc/ folder.
+
+# Installation
+
+The installation procedure is the standard for Moodle modules.
+
+Quick-step guide (copied from "Attendance"):
+Create folder /mod/attendance.
+Extract files from folder inside archive to created folder.
+Visit page Home ► Site administration ► Notifications to complete installation.
+
+You also need to install the following extension: https://github.com/thiagocaetano/PicAttendance-PHP-Extension
