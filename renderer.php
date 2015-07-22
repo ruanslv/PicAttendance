@@ -765,7 +765,7 @@ class mod_attendance_renderer extends plugin_renderer_base {
             $o .= html_writer::empty_tag('hr');
             
            
-            $photorecords = $DB->get_records('attendance_images', array('studentid' => intval($userdata->user->id)));
+            $photorecords = $DB->get_records('attendance_images', array('studentid' => intval($userdata->user->id), 'approved' => 1));
             if (!empty($photorecords)) {
                 $o .= html_writer::tag('h5', 'These are the photos we think it\'s you. Click on one to untag yourself. ');
                 // PicAttendance

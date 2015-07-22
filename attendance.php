@@ -99,7 +99,8 @@ if ($mform->is_cancelled()) {
         redirect($refresh);
     } else {
         $success = $att->take_from_student($fromform->sessid, $USER->id);
-
+        $faceimgrec->approved = 1;
+        $DB->update_record('attendance_images', $faceimgrec);
         $url = new moodle_url('/mod/attendance/view.php', array('id' => $cm->id));
         if ($success) {
         // Redirect back to the view page for the block.
